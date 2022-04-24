@@ -92,6 +92,14 @@ Happy minting, binding, and resolving!
 See arklet/settings.py for the full list of options to put in your config file.
 
 ## Deploying
+:warning: Django being Django, you have to test the _production_ build locally.
+Why ? In _development_ build (ie: with `debug` turned on) Django servers the static content, while in
+_production_ mode it doesn't. [Whitenoise](http://whitenoise.evans.io/en/stable/)
+is used to serve the static content in _production_.
+
+To simulate _production_ mode, just set `ARK_DEBUG` to `False` in your local environment's
+configuration (or build the _prod_ build target).
+
 ### With docker
 Using the provided Dockerfile (is you wish to set a build target, use `prod`, 
 but being the default target you can skip this), provide the following values

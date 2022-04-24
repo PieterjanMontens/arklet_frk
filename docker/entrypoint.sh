@@ -2,7 +2,7 @@
 # Getting static files for Admin panel hosting!
 set -e
 
-# White while DB is spinning up
+# Wait a bit while DB is spinning up
 echo "pg_isready -h $ARKLET_POSTGRES_HOST -p $ARKLET_POSTGRES_PORT"
 while ! pg_isready -h $ARKLET_POSTGRES_HOST -p $ARKLET_POSTGRES_PORT; do
     >&2 echo "Postgres is unavailable - sleeping"
@@ -14,7 +14,19 @@ done
 # ./manage.py compress --force
 
 ./manage.py migrate
-./manage.py createsuperuser
 
-./manage.py runserver 0.0.0.0:$ARKLET_PORT
-# gunicorn config.wsgi:application -w 2 -b :8880 --reload
+case "$ENV" in
+    "dev")
+        # Run the Django development server
+        ./manage.py runserver 0.0.0.0:$ARKLET_PORT
+        ;;
+    "prod")
+        # Run the Gunicorn production server
+        ./manage.py collectstatic --noinput
+        gunicorn arklet.wsgi:application -w 2 -b :$ARKLET_PORT --reload
+        ;;
+    *)
+        echo "Wrong environment defined, check ENV value (prod|dev)"
+        exit 1
+        ;;
+esac

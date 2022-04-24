@@ -19,6 +19,7 @@ services:
         context: .
         target: dev
         dockerfile: ./Dockerfile
+    #command: tail -F /var/log/lastlog 
     command: /app/entrypoint.sh
     volumes:
       - ./ark:/app/ark

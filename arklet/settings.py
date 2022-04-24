@@ -31,6 +31,8 @@ env = environ.Env(
     ARKLET_SENTRY_TRANSACTIONS_PER_TRACE=(int, 1),
     ARKLET_STATIC_ROOT=(str, "static"),
     ARKLET_MEDIA_ROOT=(str, "media"),
+    COMPRESSION_ENABLED=(bool, True),
+
 )
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -62,11 +64,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "compressor",
     "ark.apps.ArkConfig",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -168,9 +172,21 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = "/static/"
-
 STATIC_ROOT = env.str("ARKLET_STATIC_ROOT")
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "compressor.finders.CompressorFinder",
+]
 
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_FINDERS += ["compressor.finders.CompressorFinder"]
+
+COMPRESS_ENABLED = env.bool("COMPRESSION_ENABLED")
+COMPRESS_OFFLINE = True
+COMPRESS_STORAGE = "compressor.storage.GzipCompressorFileStorage"
+
+# Media files
 MEDIA_ROOT = env.str("ARKLET_MEDIA_ROOT")
 
 # Default primary key field type
