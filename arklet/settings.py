@@ -54,6 +54,9 @@ ALLOWED_HOSTS = [
     "ark.archive.org",
 ]
 
+CSRF_TRUSTED_ORIGINS=[
+    'https://%s' % env("ARKLET_HOST")
+]
 
 # Application definition
 
