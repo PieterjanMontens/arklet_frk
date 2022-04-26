@@ -33,7 +33,6 @@ RUN ./install-packages.sh
 FROM common-base AS dependencies
 ENV PATH="/opt/venv/bin:$PATH"
 
-#     apt-get install build-essential -y
 COPY requirements.txt /app/
 
 RUN pip install --target /opt/packages -r requirements.txt
@@ -44,7 +43,7 @@ RUN pip install --target /opt/packages -r requirements.txt
 FROM common-base AS app-run
 COPY --from=dependencies /opt/packages /opt/packages
 ENV PYTHONPATH "${PYTHONPATH}:/opt/packages"
-# ENV  PYTHONPATH="$PYTHONPATH:/app/lemarche:/app/config"
+ENV PATH "${PATH}:/opt/packages/bin"
 COPY ./ark ./ark
 COPY ./ark_import ./ark_import
 COPY ./arklet ./arklet
